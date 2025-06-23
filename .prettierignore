@@ -1,0 +1,31 @@
+# Ignore build output
+.next
+out
+
+# Node modules
+node_modules
+
+# Logs
+logs
+*.log
+
+# System files
+.DS_Store
+
+# Env files
+.env*
+!.env.example
+
+# Public files (optional)
+public/static
+public/images
+
+# Coverage
+coverage
+
+# IDE settings
+.vscode
+.idea
+
+# Git
+.git

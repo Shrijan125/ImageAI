@@ -1,12 +1,12 @@
-import React from 'react'
+import React from 'react';
 
 const Footer = () => {
-    const currentYear = new Date().getFullYear();
+  const currentYear = new Date().getFullYear();
   return (
-    <div className='mt-40 text-white/50 text-center border-t border-white/15 border-[1px] p-4'>
-        &copy; {currentYear} Shrijan Shreshth. All rights reserved. <br />
-    </div>
-  )
-}
+    <footer className="text-white/50 text-center border-white/15 border-t-[1px] mt-40 p-4">
+      &copy; {currentYear} Shrijan Shreshth. All rights reserved. <br />
+    </footer>
+  );
+};
 
-export default Footer
+export default Footer;
