@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        String   @id @default(uuid())
+  username  String  
+  email     String   @unique
+  password  String
+  refreshToken String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TrainModel {
+  id         String   @id @default(uuid())
+  name       String
+  type       Gender
+  age        Int
+  ethinicity Ethinicity
+  eyeColor   EyeColor
+  bald       Boolean
+  triggerWord String?
+  tensorPath String?
+  status    Status @default(PENDING)
+  images     String[] 
+  userId     String
+  falAIRequestId String?
+
+  zipUrl      String
+
+  OutputImages OutputImages[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+
+model  OutputImages{
+  id        String   @id @default(uuid())
+  imageUrl  String  @default("")
+  modelId  String
+  userId   String
+  falAIRequestId String?
+  prompt   String
+  status  Status  @default(PENDING)
+  model  TrainModel @relation(fields: [modelId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Packs {
+  id        String   @id @default(uuid())
+  name      String
+
+  PackPrompts PackPrompts[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PackPrompts{
+  id        String   @id @default(uuid())
+  packId    String
+  prompt    String
+  pack     Packs @relation(fields: [packId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum Gender {
+  MAN
+  WOMAN
+  OTHERS
+}
+
+enum Ethinicity {
+  ASIAN
+  BLACK
+  ASIAN_AMERICAN
+  WHITE
+  EAST_ASIAN 
+  SOUTH_EAST_ASIAN 
+  SOUTH_ASIAN 
+  MIDDLE_EASTERN 
+  PACIFIC
+  HISPANIC
+}
+
+enum EyeColor {
+  BROWN
+  BLUE
+  GREEN
+  GRAY
+  HAZEL
+  AMBER
+}
+
+enum Status {
+  PENDING
+  GENERATED
+  FAILED
+}

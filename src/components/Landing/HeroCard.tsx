@@ -8,6 +8,7 @@ import {
 } from 'framer-motion';
 import { useRef, useEffect } from 'react';
 import { CircleArrowUp } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type AnimatedCounterProps = {
   value: number;
@@ -17,7 +18,7 @@ type AnimatedCounterProps = {
 const AnimatedCounter = ({ value, duration = 2 }: AnimatedCounterProps) => {
   const ref = useRef<HTMLSpanElement>(null);
   const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { 
+  const springValue = useSpring(motionValue, {
     stiffness: 100,
     damping: 20,
   });
@@ -53,7 +54,7 @@ const HeroCard = () => {
     once: true,
     margin: '0px 0px -100px 0px',
   });
-
+  const router = useRouter();
   const stats = [
     { value: 100, suffix: 'K+', label: 'AI Portraits Generated' },
     { value: 50, suffix: 'K+', label: 'Happy Users' },
@@ -76,7 +77,7 @@ const HeroCard = () => {
               className="bg-gradient-to-b from-white via-zinc-300 bg-clip-text to-zinc-500"
             >
               <h1 className="text-6xl font-extrabold text-transparent">
-                PHOTO AI
+                IMAGE AI
               </h1>
             </motion.div>
           </div>
@@ -86,7 +87,11 @@ const HeroCard = () => {
           AI—effortless creative, and uniquely styled.
         </p>
 
-        <button className=" px-8 py-4 relative rounded-lg overflow-x-hidden"
+        <button
+          onClick={() => {
+            router.push('/signin');
+          }}
+          className=" px-8 py-4 relative rounded-lg overflow-x-hidden"
         >
           <motion.span
             initial={{ x: '-100%' }}
@@ -125,7 +130,9 @@ const HeroCard = () => {
                 {stat.suffix}
               </span>
             </div>
-            <p className="text-center  text-secondary-text mt-2">{stat.label}</p>
+            <p className="text-center  text-secondary-text mt-2">
+              {stat.label}
+            </p>
           </motion.div>
         ))}
       </div>

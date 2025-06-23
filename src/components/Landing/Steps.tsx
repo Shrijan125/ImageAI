@@ -1,6 +1,6 @@
 import React from 'react';
-import Card from './Card';
 import { Download, Upload, WandSparkles } from 'lucide-react';
+import Card from './Card';
 
 const Steps = () => {
   return (
