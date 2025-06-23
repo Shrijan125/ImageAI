@@ -27,7 +27,7 @@ const Pricing = () => {
     ],
   ];
   return (
-    <div className="text-white mt-40 px-4">
+    <div className="text-white mt-40 px-4 max-w-7xl mx-auto">
       <div className="flex flex-col items-center gap-2">
         <h1 className="text-center sm:text-4xl text-3xl  font-bold tracking-wide">
           Simple,{' '}

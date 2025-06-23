@@ -9,8 +9,8 @@ const ImageShowCase = () => {
     ['/PhotoAI/img7.png', '/PhotoAI/img8.png', '/PhotoAI/img9.png'],
   ];
   return (
-    <div className="flex flex-col mt-20 gap-8">
-      <div className="flex items-center justify-center h-full gap-4 w-[60%] border-[1px] border-purple-200/40 rounded-3xl mx-auto py-3 bg-purple-400/40">
+    <div className="flex flex-col mt-20 gap-8 max-w-7xl mx-auto">
+      <div className="flex items-center justify-center h-full gap-4 w-[60%] lg:w-[20%] sm:w-[30%] border-[1px] border-purple-200/40 rounded-3xl mx-auto py-3 bg-purple-400/40">
         <div className="items-center flex justify-center">
           <Sparkles className="text-purple-300"></Sparkles>
         </div>
@@ -23,7 +23,7 @@ const ImageShowCase = () => {
           {images[0]?.map((image, index) => (
             <div
               key={index}
-              className="h-[200px] relative rounded-lg overflow-hidden"
+              className="h-[200px] sm:h-[400px] lg:h-[600px] relative rounded-lg overflow-hidden"
             >
               <Image
                 src={image}
@@ -38,7 +38,7 @@ const ImageShowCase = () => {
           {images[1]?.map((image, index) => (
             <div
               key={index}
-              className="h-[200px] relative rounded-lg overflow-hidden"
+              className="h-[200px] sm:h-[400px] lg:h-[600px] relative rounded-lg overflow-hidden"
             >
               <Image
                 src={image}
@@ -53,7 +53,7 @@ const ImageShowCase = () => {
           {images[2]?.map((image, index) => (
             <div
               key={index}
-              className="h-[200px] relative rounded-lg overflow-hidden"
+              className="h-[200px] sm:h-[400px] lg:h-[600px] relative rounded-lg overflow-hidden"
             >
               <Image
                 src={image}

@@ -17,7 +17,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
 }) => {
   return (
     <div
-      className={`w-full sm:w-[80%] p-[1px] rounded-lg h-full ${recommended ? 'bg-gradient-to-b from-indigo-500 to-purple-500' : 'bg-transparent'}`}
+      className={`w-full lg:w-[80%] p-[1px] rounded-lg h-full ${recommended ? 'bg-gradient-to-b from-indigo-500 to-purple-500' : 'bg-transparent'}`}
     >
       <div
         className={`h-full p-6 flex flex-col justify-between rounded-lg ${recommended ? 'bg-black/90' : 'bg-white/5'}`}
@@ -38,7 +38,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
           ))}
         </div>
         <Button
-          className={`mt-2 w-full ${recommended ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-white/20'}`}
+          className={`mt-2 hover:cursor-pointer w-full ${recommended ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-white/20'}`}
         >
           Get Started
         </Button>

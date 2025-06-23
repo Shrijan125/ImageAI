@@ -17,7 +17,10 @@ type AnimatedCounterProps = {
 const AnimatedCounter = ({ value, duration = 2 }: AnimatedCounterProps) => {
   const ref = useRef<HTMLSpanElement>(null);
   const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, { duration: duration * 1000 });
+  const springValue = useSpring(motionValue, { 
+    stiffness: 100,
+    damping: 20,
+  });
   const isInView = useInView(ref, { once: true, margin: '0px 0px -100px 0px' });
 
   useEffect(() => {
@@ -60,7 +63,7 @@ const HeroCard = () => {
 
   return (
     <>
-      <div className="text-white flex items-center flex-col gap-10 mt-36 relative">
+      <div className="text-white flex items-center flex-col gap-10 mt-36 relative  max-w-7xl mx-auto">
         <div className="absolute -right-14 top-0 bg-purple-500 h-40 w-40 rounded-full blur-[160px]"></div>
         <div className="absolute -left-14 top-80 bg-indigo-500 h-40 w-40 rounded-full blur-[160px]"></div>
         <div className="flex flex-col items-center">
@@ -102,7 +105,7 @@ const HeroCard = () => {
 
       <div
         ref={containerRef}
-        className="w-full sm:w-[60%] mx-auto mt-20 grid grid-cols-2 sm:grid-cols-4 items-center p-8 gap-x-10 gap-y-14"
+        className="w-full lg:w-[60%] sm:w-[80%] px-4 whitespace-nowrap max-w-7xl  place-items-center  mx-auto mt-20 grid grid-cols-2 sm:grid-cols-4 items-center  gap-x-10 gap-y-14"
       >
         {stats.map((stat, index) => (
           <motion.div
@@ -122,7 +125,7 @@ const HeroCard = () => {
                 {stat.suffix}
               </span>
             </div>
-            <p className="text-center text-s mt-2">{stat.label}</p>
+            <p className="text-center  text-secondary-text mt-2">{stat.label}</p>
           </motion.div>
         ))}
       </div>
