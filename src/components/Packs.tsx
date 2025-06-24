@@ -17,7 +17,8 @@ const populatePrompt = (template: string, model: TrainModel): string => {
     .replace(/<age>/g, String(model.age))
     .replace(/<gender>/g, model.type)
     .replace(/<ethnicity>/g, model.ethinicity)
-    .replace(/<eye_color>/g, model.eyeColor);
+    .replace(/<eye_color>/g, model.eyeColor).
+    replace(/<bald>/g, '');;
 };
 
 const Packs = () => {
