@@ -7,7 +7,6 @@ const Camera = () => {
   useEffect(() => {
     const fetchImages = async () => {
       const result = await getImages();
-      console.log(result);
       setImages(result);
     };
     fetchImages();

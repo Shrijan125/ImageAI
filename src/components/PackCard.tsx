@@ -4,10 +4,8 @@ import Loader from './Loader';
 
 interface PackCardProps {
   imgUrl: string;
-  selected?: boolean;
   name: string;
   description: string;
-  setSelected: React.Dispatch<React.SetStateAction<string>>;
   id: string;
   handleGenerate: (packid: string) => Promise<void>
   loading: boolean;
@@ -15,7 +13,6 @@ interface PackCardProps {
 
 const PackCard: React.FC<PackCardProps> = ({
   imgUrl,
-  setSelected,
   name,
   description,
   id,
@@ -24,9 +21,6 @@ const PackCard: React.FC<PackCardProps> = ({
 }) => {
   return (
     <div
-      onClick={() => {
-        setSelected(id);
-      }}
       className={`relative border-[1px] rounded-md sm:w-[90%] w-full h-[500px] overflow-hidden border-white/30 hover:backdrop-blur-2xl hover:shadow-2xl hover:shadow-primary/30 group transition-all duration-300`}
     >
       <img

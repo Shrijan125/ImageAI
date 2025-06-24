@@ -17,90 +17,88 @@ const populatePrompt = (template: string, model: TrainModel): string => {
     .replace(/<age>/g, String(model.age))
     .replace(/<gender>/g, model.type)
     .replace(/<ethnicity>/g, model.ethinicity)
-    .replace(/<eye_color>/g, model.eyeColor)
-    .replace(/<bald>/g, model.bald ? 'bald' : 'not bald');
+    .replace(/<eye_color>/g, model.eyeColor);
 };
 
 const Packs = () => {
   const [models, setModels] = useState<TrainModel[]>([]);
   const [packs, setPacks] = useState<GetPackResponse[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingPackId, setLoadingPackId] = useState<string>('');
   const { setCredits, credits } = useCredits();
   const router = useRouter();
 
   const handleGenerate = async (packId: string) => {
-  setLoading(true);
+    setLoadingPackId(packId); // Set the specific pack as loading
 
-  if (!selectedModel) {
-    toast.error('Please select a model.');
-    setLoading(false);
-    return;
-  }
-
-  const modelDetails = models.find(model => model.id === selectedModel);
-  if (!modelDetails?.tensorPath) {
-    toast.error('Selected model is not trained yet.');
-    setLoading(false);
-    return;
-  }
-
-  const prompts = packs.find(pack => pack.id === packId)?.PackPrompts;
-  if (!prompts || prompts.length === 0) {
-    toast.error('Selected pack has no prompts.');
-    setLoading(false);
-    return;
-  }
-
-  const cost = prompts.length * 5;
-  if (credits < cost) {
-    toast.error('You do not have enough credits to generate images.');
-    setLoading(false);
-    router.push('/home/pricing');
-    return;
-  }
-
-  try {
-    const results = await Promise.all(
-      prompts.map(p => 
-        fal.subscribe('fal-ai/flux-lora', {
-          input: {
-            prompt: populatePrompt(p.prompt, modelDetails),
-            loras: [
-              {
-                path: modelDetails.tensorPath!,
-                scale: 1.0,
-              },
-            ],
-          },
-          pollInterval: 5000,
-          logs: false,
-        })
-      )
-    );
-
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i];
-      const imageUrl = result?.data?.images?.[0]?.url;
-      if (!imageUrl) continue;
-
-      await saveImage(
-        imageUrl,
-        selectedModel,
-        prompts[i].prompt,
-        result.requestId,
-        cost
-      );
-      setCredits(prev => prev - (cost));
+    if (!selectedModel) {
+      toast.error('Please select a model.');
+      setLoadingPackId(''); // Reset loading state
+      return;
     }
 
-    toast.success('Images generated successfully!');
-  } catch (error) {
-    toast.error('Image generation failed.');
-  }
+    const modelDetails = models.find(model => model.id === selectedModel);
+    if (!modelDetails?.tensorPath) {
+      toast.error('Selected model is not trained yet.');
+      setLoadingPackId(''); // Reset loading state
+      return;
+    }
 
-  setLoading(false);
-};
+    const prompts = packs.find(pack => pack.id === packId)?.PackPrompts;
+    if (!prompts || prompts.length === 0) {
+      toast.error('Selected pack has no prompts.');
+      setLoadingPackId(''); // Reset loading state
+      return;
+    }
+
+    const cost = prompts.length * 5;
+    if (credits < cost) {
+      toast.error('You do not have enough credits to generate images.');
+      setLoadingPackId(''); // Reset loading state
+      router.push('/home/pricing');
+      return;
+    }
+
+    try {
+      const results = await Promise.all(
+        prompts.map(p => 
+          fal.subscribe('fal-ai/flux-lora', {
+            input: {
+              prompt: populatePrompt(p.prompt, modelDetails),
+              loras: [
+                {
+                  path: modelDetails.tensorPath!,
+                  scale: 1.0,
+                },
+              ],
+            },
+            pollInterval: 5000,
+            logs: false,
+          })
+        )
+      );
+
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        const imageUrl = result?.data?.images?.[0]?.url;
+        if (!imageUrl) continue;
+
+        await saveImage(
+          imageUrl,
+          selectedModel,
+          prompts[i].prompt,
+          result.requestId,
+          5
+        );
+      }
+      setCredits(prev => prev - (cost));
+      toast.success('Images generated successfully!');
+    } catch (error) {
+      toast.error('Image generation failed.');
+    }
+
+    setLoadingPackId(''); // Reset loading state
+  };
 
 
   useEffect(() => {
@@ -147,14 +145,12 @@ const Packs = () => {
         {packs.map((pack, index) => (
           <PackCard
             id={pack.id}
-            setSelected={setSelectedModel}
-            selected={selectedModel === pack.id}
             key={index}
             imgUrl={pack.thumbnailUrl}
             name={pack.name}
             description={pack.description}
             handleGenerate={handleGenerate}
-            loading={loading}
+            loading={pack.id === loadingPackId}
           ></PackCard>
         ))}
       </div>
