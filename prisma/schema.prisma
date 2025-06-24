@@ -28,6 +28,8 @@ model User {
   TrainModel TrainModel[]
 
   OutputImages OutputImages[]
+
+  Transacitons Transacitons[]
 }
 
 model TrainModel {
@@ -106,6 +108,17 @@ enum Ethinicity {
   MIDDLE_EASTERN 
   PACIFIC
   HISPANIC
+}
+
+model Transacitons{
+  id        String   @id @default(uuid())
+  userId    String
+  amount    Int
+  razorpayOrderId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User      User @relation(fields: [userId], references: [id])
 }
 
 enum EyeColor {

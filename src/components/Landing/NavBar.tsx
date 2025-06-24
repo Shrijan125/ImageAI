@@ -1,13 +1,21 @@
 'use client';
 import Image from 'next/image';
-import React from 'react';
+import React, { use } from 'react';
 import { useSession } from 'next-auth/react';
 import Loader from '../Loader';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@radix-ui/react-avatar';
+import { useCredits } from '@/context/CreditsProvider';
+import { PlusCircle, PlusIcon } from 'lucide-react';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const NavBar = () => {
   const session = useSession();
+  const { credits } = useCredits();
   const user = session.data?.user;
   const loading = session.status === 'loading';
   const router = useRouter();
@@ -29,6 +37,20 @@ const NavBar = () => {
             <Loader></Loader>
           ) : user ? (
             <div>
+              <Popover>
+                <PopoverTrigger className="text-xs flex gap-2 items-center justify-center hover:cursor-pointer">
+                  <PlusCircle className="size-4"></PlusCircle>
+                  <span className="font-bold">
+                    {credits} {credits === 0 ? 'Credit' : 'Credits'}
+                  </span>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <div className="flex items-center p-y-1 justify-between">
+                    <div className='text-sm'>Add Credits</div>
+                    <PlusIcon className="size-4"></PlusIcon>
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Avatar>
                 <AvatarFallback>{user.name}</AvatarFallback>
               </Avatar>
