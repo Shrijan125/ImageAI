@@ -4,6 +4,7 @@ import Generated from '@/components/Generated';
 import Camera from '@/components/Camera';
 import NavBar from '@/components/landing/NavBar';
 import Packs from '@/components/Packs';
+// import Train from '@/components/Train';
 const page = () => {
   return (
     <div className="">
