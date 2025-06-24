@@ -10,9 +10,12 @@ import { TrainModel } from '@/generated/prisma';
 import ModelCard from './ModelCard';
 import { toast } from 'sonner';
 import { saveImage } from '@/actions/gallery';
+import { useCredits } from '@/context/CreditsProvider';
+import { useRouter } from 'next/navigation';
 
 const Generated = () => {
   const [models, setModels] = useState<TrainModel[]>([]);
+  const {setCredits, credits} = useCredits();
   useEffect(() => {
     const fetchModels = async () => {
       const result: TrainModel[] = await getModels();
@@ -21,6 +24,7 @@ const Generated = () => {
     fetchModels();
   }, []);
   const [prompt, setPrompt] = useState<string>('');
+  const router = useRouter();
   const [imageUrl, setImageUrl] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<string>('');
@@ -34,6 +38,12 @@ const Generated = () => {
     if (!prompt || prompt.trim() === '') {
       toast.error('Please enter a prompt');
       setLoading(false);
+      return;
+    }
+    if(credits < 5) {
+      toast.error('You do not have enough credits to generate an image.');
+      setLoading(false);
+      router.push('/home/pricing');
       return;
     }
     const modelDetails = models.find(model => model.id === selectedModel);
@@ -66,8 +76,10 @@ const Generated = () => {
           result.data.images[0].url,
           selectedModel,
           prompt,
-          result.requestId
+          result.requestId,
+          5
         );
+        setCredits(prev => prev - 5);
       } catch (error) {
         throw new Error('Failed to save image');
       }

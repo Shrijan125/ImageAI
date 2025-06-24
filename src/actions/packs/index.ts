@@ -1,17 +1,29 @@
 'use server';
 
 import prisma from '@/db';
-import { Packs } from '@/generated/prisma';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
 
-export const getPacks = async (): Promise<Packs[]> => {
+export interface GetPackResponse {
+  id: string;
+  name: string;
+  thumbnailUrl: string;
+  description: string;
+  createdAt: Date;
+  updatedAt: Date;
+  PackPrompts: {
+    id: string;
+    prompt: string;
+  }[];
+}[]
+
+export const getPacks = async (): Promise<GetPackResponse[]> => {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
     return [];
   }
 
-  const packs: Packs[] = await prisma.packs.findMany({
+  const packs = await prisma.packs.findMany({
     where: {
       PackPrompts: {
         some: {
@@ -20,6 +32,14 @@ export const getPacks = async (): Promise<Packs[]> => {
           },
         },
       },
+    },
+    include:{
+      PackPrompts: {
+        select: {
+          prompt: true,
+          id: true,
+        },
+      }
     },
     orderBy: {
       createdAt: 'desc',

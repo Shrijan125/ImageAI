@@ -13,7 +13,7 @@ const page = () => {
       <div className="flex-1">
         <NavBar></NavBar>
         <div className="mt-24 max-w-7xl mx-auto">
-          <Tabs defaultValue="train" className="max-w-7xl">
+          <Tabs defaultValue="camera" className="max-w-7xl">
             <TabsList className="w-[400px] mx-auto">
               <TabsTrigger value="camera">Camera</TabsTrigger>
               <TabsTrigger value="generate">Generate Image</TabsTrigger>

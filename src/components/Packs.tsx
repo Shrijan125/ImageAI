@@ -1,22 +1,113 @@
 'use client';
-import type { Packs, TrainModel } from '@/generated/prisma';
+import type { TrainModel } from '@/generated/prisma';
 import React, { useEffect, useState } from 'react';
 import ModelCard from './ModelCard';
 import { getModels } from '@/actions/models';
-import { getPacks } from '@/actions/packs';
+import { GetPackResponse, getPacks } from '@/actions/packs';
 import { toast } from 'sonner';
 import PackCard from './PackCard';
+import { saveImage } from '@/actions/gallery';
+import { fal } from '@fal-ai/client';
+import { useCredits } from '@/context/CreditsProvider';
+import { useRouter } from 'next/navigation';
+
+const populatePrompt = (template: string, model: TrainModel): string => {
+  return template
+    .replace(/<model_name>/g, model.name)
+    .replace(/<age>/g, String(model.age))
+    .replace(/<gender>/g, model.type)
+    .replace(/<ethnicity>/g, model.ethinicity)
+    .replace(/<eye_color>/g, model.eyeColor)
+    .replace(/<bald>/g, model.bald ? 'bald' : 'not bald');
+};
 
 const Packs = () => {
   const [models, setModels] = useState<TrainModel[]>([]);
-  const [packs, setPacks] = useState<Packs[]>([]);
+  const [packs, setPacks] = useState<GetPackResponse[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const { setCredits, credits } = useCredits();
+  const router = useRouter();
+
+  const handleGenerate = async (packId: string) => {
+  setLoading(true);
+
+  if (!selectedModel) {
+    toast.error('Please select a model.');
+    setLoading(false);
+    return;
+  }
+
+  const modelDetails = models.find(model => model.id === selectedModel);
+  if (!modelDetails?.tensorPath) {
+    toast.error('Selected model is not trained yet.');
+    setLoading(false);
+    return;
+  }
+
+  const prompts = packs.find(pack => pack.id === packId)?.PackPrompts;
+  if (!prompts || prompts.length === 0) {
+    toast.error('Selected pack has no prompts.');
+    setLoading(false);
+    return;
+  }
+
+  const cost = prompts.length * 5;
+  if (credits < cost) {
+    toast.error('You do not have enough credits to generate images.');
+    setLoading(false);
+    router.push('/home/pricing');
+    return;
+  }
+
+  try {
+    const results = await Promise.all(
+      prompts.map(p => 
+        fal.subscribe('fal-ai/flux-lora', {
+          input: {
+            prompt: populatePrompt(p.prompt, modelDetails),
+            loras: [
+              {
+                path: modelDetails.tensorPath!,
+                scale: 1.0,
+              },
+            ],
+          },
+          pollInterval: 5000,
+          logs: false,
+        })
+      )
+    );
+
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      const imageUrl = result?.data?.images?.[0]?.url;
+      if (!imageUrl) continue;
+
+      await saveImage(
+        imageUrl,
+        selectedModel,
+        prompts[i].prompt,
+        result.requestId,
+        cost
+      );
+      setCredits(prev => prev - (cost));
+    }
+
+    toast.success('Images generated successfully!');
+  } catch (error) {
+    toast.error('Image generation failed.');
+  }
+
+  setLoading(false);
+};
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const modelsResponse = await getModels();
-        const packsResponse = await getPacks();
+        const packsResponse : GetPackResponse[] = await getPacks();
         setModels(modelsResponse);
         setPacks(packsResponse);
       } catch (error) {
@@ -62,6 +153,8 @@ const Packs = () => {
             imgUrl={pack.thumbnailUrl}
             name={pack.name}
             description={pack.description}
+            handleGenerate={handleGenerate}
+            loading={loading}
           ></PackCard>
         ))}
       </div>

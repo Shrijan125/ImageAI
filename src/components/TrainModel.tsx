@@ -3,19 +3,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState, useRef, DragEvent, ChangeEvent } from 'react';
 import { z } from 'zod';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import axios from 'axios';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,7 +22,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import JSZip from 'jszip';
 import { toast } from 'sonner';
@@ -43,6 +33,8 @@ import {
 } from '@/types/trainmodel-types';
 import { Alert, AlertDescription } from './ui/alert';
 import { getPresignedUrlAction, trainModel } from '@/actions/models';
+import Loader from './Loader';
+import { useCredits } from '@/context/CreditsProvider';
 
 export interface FileWithPreview {
   file: File;
@@ -65,6 +57,7 @@ const Page = () => {
       zipUrl: '',
     },
   });
+  const {setCredits} = useCredits();
 
   const handleFileSubmit = async (files: FileWithPreview[]) => {
     try {
@@ -78,30 +71,29 @@ const Page = () => {
         const content = await zip.generateAsync({ type: 'blob' });
         const formData = new FormData();
         formData.append('file', content);
-        const { data } = await axios.put(url, content);
+        await axios.put(url, content);
         form.setValue(
           'zipUrl',
           process.env.NEXT_PUBLIC_CLOUDFLARE_BASE_URL + '/' + modelkey
         );
       }
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to get upload';
-        throw new Error(errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to get upload';
+      throw new Error(errorMessage);
     }
   };
 
   const handleSubmit = async () => {
     try {
       await handleFileSubmit(files);
-    await trainModel(form.getValues());
+      await trainModel(form.getValues());
+      setCredits(prev => prev - 20);
       toast.success('Model created successfully');
     } catch (error) {
       toast.error('Failed to create model');
     }
   };
-
-  const router = useRouter();
-
   const formatFileSize = (bytes: number): string => {
     return (bytes / 1024 / 1024).toFixed(2);
   };
@@ -119,7 +111,7 @@ const Page = () => {
   };
   const loading = form.formState.isSubmitting;
   const [files, setFiles] = useState<FileWithPreview[]>([]);
-  const maxFiles = 10;
+  const maxFiles = 20;
   const maxSize = 5 * 1024 * 1024;
   const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
@@ -138,7 +130,6 @@ const Page = () => {
 
     const fileArray = Array.from(fileList);
 
-    // Check if adding these files would exceed maxFiles
     if (files.length + fileArray.length > maxFiles) {
       setError(`Maximum ${maxFiles} files allowed`);
       return;
@@ -199,24 +190,53 @@ const Page = () => {
   };
 
   return (
-    <div className="flex w-screen justify-center items-center min-h-screen py-8">
-      <Card className="w-[30%] min-w-[400px]">
-        <CardHeader>
-          <CardTitle>Train Model</CardTitle>
-          <CardDescription>Train once, and generate forever</CardDescription>
-        </CardHeader>
+    <div className="grid grid-cols-1 sm:grid-cols-2 mt-8 px-4">
+      <div className="border-r-[1px] px-4">
+        <div className="flex flex-col gap-1 mb-5">
+          <h1 className="text-2xl font-bold">Train New Model</h1>
+          <p className="text-secondary-text">
+            Create a custom AI model with your photos
+          </p>
+        </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <CardContent className="flex flex-col gap-6">
+          <form className='space-y-6' onSubmit={form.handleSubmit(handleSubmit)}>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Name of the model" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex gap-2">
               <FormField
                 control={form.control}
-                name="name"
+                name="type"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Name of the model" {...field} />
-                    </FormControl>
+                  <FormItem className='w-[40%]'>
+                    <FormLabel>Type</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className='w-full'>
+                          <SelectValue placeholder="Select a type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {TYPE.map((type, index) => (
+                          <SelectItem key={index} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -234,47 +254,42 @@ const Page = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
-                name="type"
+                name="bald"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a type" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {TYPE.map((type, index) => (
-                          <SelectItem key={index} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
+                  <FormItem className="">
+                      <FormLabel>Bald</FormLabel>
+                    <FormControl>
+                      <div className='flex items-center justify-center gap-4'>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <div className='text-secondary-text'>
+                        {
+                          form.getValues().bald ? 'Yes' : 'No'
+                        }
+                      </div>
+                      </div>
+                    </FormControl>
                   </FormItem>
                 )}
               />
-
+            </div>
+            <div className="flex gap-4">
               <FormField
                 control={form.control}
                 name="ethinicity"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-[50%]'>
                     <FormLabel>Ethnicity</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className='w-full'>
                           <SelectValue placeholder="Select ethnicity" />
                         </SelectTrigger>
                       </FormControl>
@@ -290,19 +305,18 @@ const Page = () => {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="eyeColor"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-[50%]'>
                     <FormLabel>Eye Color</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className='w-full'>
                           <SelectValue placeholder="Select eye color" />
                         </SelectTrigger>
                       </FormControl>
@@ -318,169 +332,150 @@ const Page = () => {
                   </FormItem>
                 )}
               />
+            </div>
+            <FormField
+              control={form.control}
+              name="zipUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Upload Images</FormLabel>
+                  <FormControl>
 
-              <FormField
-                control={form.control}
-                name="bald"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                      <FormLabel>Bald</FormLabel>
-                      <FormDescription>
-                        Toggle if the person is bald
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+                    <div className="w-full max-w-2xl mx-auto mt-4">
+                      <div
+                        className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${
+                          dragActive
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-300 hover:border-gray-400'
+                        }`}
+                        onDragEnter={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
+                        onDrop={handleDrop}
+                      >
+                        <input
+                          ref={inputRef}
+                          type="file"
+                          multiple
+                          accept={allowedTypes.join(',')}
+                          onChange={handleChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
 
-              <FormField
-                control={form.control}
-                name="zipUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload Images</FormLabel>
-                    <FormControl>
-                      {/* <DragDropImage 
-                        onChange={field.onChange}
-                      /> */}
-                      <div className="w-full max-w-2xl mx-auto p-6">
-                        <div
-                          className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${
-                            dragActive
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-300 hover:border-gray-400'
-                          }`}
-                          onDragEnter={handleDrag}
-                          onDragLeave={handleDrag}
-                          onDragOver={handleDrag}
-                          onDrop={handleDrop}
-                        >
-                          <input
-                            ref={inputRef}
-                            type="file"
-                            multiple
-                            accept={allowedTypes.join(',')}
-                            onChange={handleChange}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          />
+                        <div className="flex flex-col items-center space-yy--4">
+                          <div
+                            className={`p-4 rounded-full ${dragActive ? 'bg-blue-100' : 'bg-gray-100'}`}
+                          >
+                            <Upload
+                              className={`w-8 h-8 ${dragActive ? 'text-blue-500' : 'text-gray-400'}`}
+                            />
+                          </div>
 
-                          <div className="flex flex-col items-center space-y-4">
-                            <div
-                              className={`p-4 rounded-full ${dragActive ? 'bg-blue-100' : 'bg-gray-100'}`}
-                            >
-                              <Upload
-                                className={`w-8 h-8 ${dragActive ? 'text-blue-500' : 'text-gray-400'}`}
-                              />
-                            </div>
-
-                            <div>
-                              <p className="text-lg font-medium text-gray-700">
-                                {dragActive
-                                  ? 'Drop your images here'
-                                  : 'Drag & drop images here'}
-                              </p>
-                              <p className="text-sm text-gray-500 mt-1">
-                                or{' '}
-                                <button
-                                  type="button"
-                                  onClick={onButtonClick}
-                                  className="text-blue-600 hover:text-blue-700 font-medium underline"
-                                >
-                                  browse files
-                                </button>
-                              </p>
-                            </div>
-
-                            <p className="text-xs text-gray-400">
-                              Supports: JPEG, PNG, GIF, WebP (max{' '}
-                              {(maxSize / 1024 / 1024).toFixed(1)}MB each,{' '}
-                              {maxFiles} files max)
+                          <div>
+                            <p className="text-lg font-medium text-gray-700">
+                              {dragActive
+                                ? 'Drop your images here'
+                                : 'Drag & drop images here'}
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              or{' '}
+                              <button
+                                type="button"
+                                onClick={onButtonClick}
+                                className="text-blue-600 hover:text-blue-700 font-medium underline"
+                              >
+                                browse files
+                              </button>
                             </p>
                           </div>
+
+                          <p className="text-xs text-gray-400">
+                            Supports: JPEG, PNG (max{' '}
+                            {(maxSize / 1024 / 1024).toFixed(1)}MB each,{' '}
+                            {maxFiles} files max)
+                          </p>
                         </div>
-                        {error && (
-                          <Alert className="mt-4 border-red-200 bg-red-50">
-                            <AlertDescription className="text-red-700">
-                              {error}
-                            </AlertDescription>
-                          </Alert>
-                        )}
-                        {files.length > 0 && (
-                          <div className="mt-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                              Uploaded Images ({files.length}/{maxFiles})
-                            </h3>
-
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                              {files.map((fileObj: FileWithPreview) => (
-                                <div
-                                  key={fileObj.id}
-                                  className="relative group"
-                                >
-                                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
-                                    <img
-                                      src={fileObj.preview}
-                                      alt={fileObj.file.name}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-
-                                  {/* Remove Button */}
-                                  <button
-                                    onClick={() => removeFile(fileObj.id)}
-                                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
-                                    aria-label={`Remove ${fileObj.file.name}`}
-                                  >
-                                    <X className="w-4 h-4" />
-                                  </button>
-
-                                  {/* File Info */}
-                                  <div className="mt-2">
-                                    <p
-                                      className="text-sm font-medium text-gray-700 truncate"
-                                      title={fileObj.file.name}
-                                    >
-                                      {fileObj.file.name}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                      {formatFileSize(fileObj.file.size)} MB
-                                    </p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {files.length === 0 && !dragActive && (
-                          <div className="mt-8 text-center py-8">
-                            <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                            <p className="text-gray-500">
-                              No images uploaded yet
-                            </p>
-                          </div>
-                        )}
                       </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-            <CardFooter>
-              <Button disabled={loading} type="submit" className="w-full">
-                {loading ? 'Submitting...' : 'Submit Model'}
-              </Button>
-            </CardFooter>
+                      {error && (
+                        <Alert className="mt-4 border-red-200 bg-red-50">
+                          <AlertDescription className="text-red-700">
+                            {error}
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button disabled={loading} type='submit'>
+              {
+                loading ? <Loader></Loader> : 'Train Model (20 credits)'
+              }
+            </Button>
           </form>
         </Form>
-      </Card>
+      </div>
+      <div className="sm:pl-8 px-4 sm:px-0 sm:mt-0 mt-20 flex flex-col justify-center ">
+        <div className='text-lg font-bold'>
+          Image Preview
+          <div className='text-sm text-secondary-text'>Preview of your uploaded images</div>
+        </div>
+        {files.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Uploaded Images ({files.length}/{maxFiles})
+            </h3>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {files.map((fileObj: FileWithPreview) => (
+                <div key={fileObj.id} className="relative group">
+                  <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                    <img
+                      src={fileObj.preview}
+                      alt={fileObj.file.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  {/* Remove Button */}
+                  <button
+                    onClick={() => removeFile(fileObj.id)}
+                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
+                    aria-label={`Remove ${fileObj.file.name}`}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+
+                  {/* File Info */}
+                  <div className="mt-2">
+                    <p
+                      className="text-sm font-medium text-gray-700 truncate"
+                      title={fileObj.file.name}
+                    >
+                      {fileObj.file.name}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {formatFileSize(fileObj.file.size)} MB
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {files.length === 0 && !dragActive && (
+          <div className="mt-16 text-center py-8">
+            <div className='w-full flex items-center justify-center'> 
+            <div className='w-42 flex items-center justify-center h-42 rounded-full bg-gray-700'>
+            <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            </div>
+            </div>
+            <p className="text-secondary-text mt-8">No images uploaded yet</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

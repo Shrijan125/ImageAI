@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from './ui/button';
+import Loader from './Loader';
 
 interface PackCardProps {
   imgUrl: string;
@@ -8,6 +9,8 @@ interface PackCardProps {
   description: string;
   setSelected: React.Dispatch<React.SetStateAction<string>>;
   id: string;
+  handleGenerate: (packid: string) => Promise<void>
+  loading: boolean;
 }
 
 const PackCard: React.FC<PackCardProps> = ({
@@ -16,6 +19,8 @@ const PackCard: React.FC<PackCardProps> = ({
   name,
   description,
   id,
+  handleGenerate,
+  loading,
 }) => {
   return (
     <div
@@ -34,11 +39,17 @@ const PackCard: React.FC<PackCardProps> = ({
           <div>{name}</div>
           <p className="text-sm text-secondary-text">
             {description.length > 50
-              ? description?.substring(0, 50) + '...'
+              ? description?.substring(0, 40) + '...'
               : description}
           </p>
         </div>
-        <Button className="m-4 hover:cursor-pointer">Generate Image</Button>
+        <Button disabled={loading} onClick={async()=>{
+         await handleGenerate(id);
+        }} className="m-4 hover:cursor-pointer">
+          {
+            loading ? <Loader></Loader> : 'Generate Images'
+          }
+        </Button>
       </div>
     </div>
   );

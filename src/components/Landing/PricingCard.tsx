@@ -26,7 +26,12 @@ const PricingCard: React.FC<PricingCardProps> = ({
           <h2 className="text-2xl font-bold">{title}</h2>
           <h3 className="text-4xl font-black tracking-wide">
             {' '}
-            {price === 'Custom' ? 'Custom' : '₹ ' + price}
+            {price === 'Custom' ? 'Custom' : '₹ ' + `${price}`}
+            {price !== 'Custom' && (
+              <span className="text-base ml-2 font-normal text-secondary-text">
+                one-time
+              </span>
+            )}
           </h3>
         </div>
         <div className="flex flex-col gap-2">

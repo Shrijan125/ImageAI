@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/popover';
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Separator } from '../ui/separator';
+import Link from 'next/link';
 
 const NavBar = () => {
   const session = useSession();
@@ -23,7 +24,10 @@ const NavBar = () => {
   return (
     <header className="w-full fixed top-3 z-50 px-4">
       <div className="flex rounded-2xl py-3 border-[1px] border-white/20 backdrop-blur-xl w-full justify-between  px-6 items-center max-w-7xl mx-auto">
-        <div className="flex items-center justify-center gap-2 sm:gap-4">
+        <Link
+          href={'/home'}
+          className="flex items-center justify-center gap-2 sm:gap-4"
+        >
           <div className="relative sm:h-8 sm:w-8 w-6 h-6">
             <Image src={'/logo.svg'} alt="logo" fill className=""></Image>
           </div>
@@ -32,7 +36,7 @@ const NavBar = () => {
               IMAGEAI
             </h1>
           </div>
-        </div>
+        </Link>
         <div>
           {loading ? (
             <Loader></Loader>
@@ -64,10 +68,13 @@ const NavBar = () => {
                   </div>
                   <Separator></Separator>
                   <div className="flex flex-col gap-4 mt-4">
-                    <div className="flex items-center p-y-1 justify-between">
+                    <Link
+                      href={'/home/pricing'}
+                      className="flex items-center p-y-1 justify-between"
+                    >
                       <div className="text-sm">Add Credits</div>
                       <PlusIcon className="size-4"></PlusIcon>
-                    </div>
+                    </Link>
                     <Separator></Separator>
                     <div
                       onClick={async () => {

@@ -1,16 +1,19 @@
+'use client';
 import React from 'react';
 import PricingCard from './PricingCard';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 const Pricing = () => {
   const features = [
     [
+      '300 credits',
       'Upto 30 AI portraits',
       '1 Custom Model Training',
       '24h Support',
       'Basic Export',
     ],
     [
+      '700 credits',
       'Upto 100 AI portraits',
       '2 Custom Model Training',
       '24h Support',

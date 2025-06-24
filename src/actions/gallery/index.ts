@@ -37,7 +37,8 @@ export const saveImage = async (
   imageUrl: string,
   modelId: string,
   prompt: string,
-  requestId: string
+  requestId: string,
+  cost : number
 ): Promise<void> => {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
@@ -63,6 +64,17 @@ export const saveImage = async (
   if (!model) {
     throw new Error('Model not found');
   }
+
+  await prisma.user.update({
+    where:{
+      id: user.id,
+    },
+    data: {
+      credits: {
+        decrement: cost,
+      },
+    }
+  });
 
   await prisma.outputImages.create({
     data: {
