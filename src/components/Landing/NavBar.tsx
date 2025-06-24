@@ -1,8 +1,8 @@
+'use client';
 import Image from 'next/image';
 import React from 'react';
 import { useSession } from 'next-auth/react';
 import Loader from '../Loader';
-import { Button } from '../ui/button';
 import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback } from '@radix-ui/react-avatar';
 

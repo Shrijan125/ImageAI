@@ -1,0 +1,127 @@
+'use client';
+import { Label } from '@radix-ui/react-label';
+import React, { useEffect, useState } from 'react';
+import { Textarea } from './ui/textarea';
+import { fal } from '@fal-ai/client';
+import { Button } from './ui/button';
+import { Skeleton } from './ui/skeleton';
+import { getModels } from '@/actions/models';
+import { TrainModel } from '@/generated/prisma';
+import ModelCard from './ModelCard';
+import { toast } from 'sonner';
+import { saveImage } from '@/actions/gallery';
+
+const Generated = () => {
+  const [models, setModels] = useState<TrainModel[]>([]);
+  useEffect(() => {
+    const fetchModels = async () => {
+      const result: TrainModel[] = await getModels();
+      setModels(result);
+    };
+    fetchModels();
+  }, []);
+  const [prompt, setPrompt] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [selectedModel, setSelectedModel] = useState<string>('');
+  const handleClick = async () => {
+    setLoading(true);
+    if (!selectedModel) {
+      toast.error('Please select a model.');
+      setLoading(false);
+      return;
+    }
+    if (!prompt || prompt.trim() === '') {
+      toast.error('Please enter a prompt');
+      setLoading(false);
+      return;
+    }
+    const modelDetails = models.find(model => model.id === selectedModel);
+    if (!modelDetails?.tensorPath) {
+      toast.error('Selected model is not trained yet.');
+      setLoading(false);
+      return;
+    }
+    const result = await fal.subscribe('fal-ai/flux-lora', {
+      input: {
+        prompt: prompt,
+        loras: [
+          {
+            path: modelDetails?.tensorPath,
+            scale: 1.0,
+          },
+        ],
+      },
+      pollInterval: 5000,
+      logs: false,
+    });
+    setLoading(false);
+    setImageUrl(result.data.images[0].url);
+    if (!result?.data?.images[0]?.url) {
+      toast.error('Image generation failed. Please try again.');
+      return;
+    } else {
+      try {
+        await saveImage(
+          result.data.images[0].url,
+          selectedModel,
+          prompt,
+          result.requestId
+        );
+      } catch (error) {
+        throw new Error('Failed to save image');
+      }
+    }
+  };
+  return (
+    <div className="mt-8 flex flex-col gap-4">
+      <div className="flex flex-col gap-1 ">
+        <h1 className="text-2xl font-bold">Select Model</h1>
+        <p className="text-secondary-text">
+          Choose an AI model to generate your images
+        </p>
+      </div>
+      <div className="grid grid-cols-3 place-items-center">
+        {models.map((model, index) => (
+          <ModelCard
+            id={model.id}
+            setSelected={setSelectedModel}
+            selected={selectedModel === model.id}
+            key={index}
+            imgUrl={model.thumbNailUrl}
+            name={model.name}
+          ></ModelCard>
+        ))}
+      </div>
+      <div className="flex flex-col gap-2">
+        <Label>Enter your prompt</Label>
+        <Textarea
+          onChange={e => {
+            setPrompt(e.target.value);
+          }}
+          placeholder="Generate my image enjoying at the Maldives..."
+        ></Textarea>
+      </div>
+      <Button onClick={handleClick} variant={'outline'} className="w-[20%]">
+        Generate Image
+      </Button>
+      <div className="">
+        <div className="relative h-[600px] w-[500px] overflow-hidden rounded-md">
+          {loading ? (
+            <Skeleton className="h-full w-full"></Skeleton>
+          ) : (
+            imageUrl && (
+              <img
+                alt="generated_img"
+                className="object-cover w-full h-full"
+                src={imageUrl || undefined}
+              ></img>
+            )
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Generated;
