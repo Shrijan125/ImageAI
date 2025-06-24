@@ -69,8 +69,6 @@ const Page = () => {
   const handleFileSubmit = async (files: FileWithPreview[]) => {
     try {
       const { modelkey, url } = await getPresignedUrlAction();
-      console.log('Presigned URL:', url);
-    console.log('Model Key:', modelkey);
       const zip = new JSZip();
       if (files.length !== 0) {
         for (const fileObj of files) {
@@ -80,14 +78,10 @@ const Page = () => {
         const content = await zip.generateAsync({ type: 'blob' });
         const formData = new FormData();
         formData.append('file', content);
-        console.log('HI there');
-        console.log('Uploading to:', url);
-        // const { data } = await axios.put(url, content);
-        console.log('File uploaded successfully:', process.env.CLOUDFLARE_BASE_URL);
-        console.log(process.env.CLOUDFLARE_BASE_URL + '/' + modelkey);
+        const { data } = await axios.put(url, content);
         form.setValue(
           'zipUrl',
-          process.env.CLOUDFLARE_BASE_URL + '/' + modelkey
+          process.env.NEXT_PUBLIC_CLOUDFLARE_BASE_URL + '/' + modelkey
         );
       }
     } catch (error) {
@@ -98,9 +92,8 @@ const Page = () => {
 
   const handleSubmit = async () => {
     try {
-      const url = await handleFileSubmit(files);
-      console.log('File URL:', url);
-    // await trainModel(form.getValues());
+      await handleFileSubmit(files);
+    await trainModel(form.getValues());
       toast.success('Model created successfully');
     } catch (error) {
       toast.error('Failed to create model');

@@ -64,7 +64,7 @@ export async function getPresignedUrlAction() {
 }
 
 export const trainModel = async (
-  input: TrainModelFormValues,
+  {name, age, bald, ethinicity, eyeColor, type, zipUrl}: TrainModelFormValues
 ) => {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
@@ -82,13 +82,13 @@ export const trainModel = async (
   // );
   await prisma.trainModel.create({
     data: {
-      name: input.name,
-      age: input.age,
-      bald: input.bald,
-      ethinicity: input.ethinicity,
-      eyeColor: input.eyeColor,
-      type: input.type,
-      zipUrl: input.zipUrl,
+      name: name,
+      age: Number(age),
+      bald: bald,
+      ethinicity: ethinicity,
+      eyeColor: eyeColor,
+      type: type,
+      zipUrl: zipUrl,
       falAIRequestId: 'request_id',
       falAIResponseUrl: 'response_url',
       userId: session.user.id,
