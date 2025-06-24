@@ -1,10 +1,9 @@
 'use client';
 import Image from 'next/image';
-import React, { use } from 'react';
+import React from 'react';
 import { useSession } from 'next-auth/react';
 import Loader from '../Loader';
 import { useRouter } from 'next/navigation';
-import { Avatar, AvatarFallback } from '@radix-ui/react-avatar';
 import { useCredits } from '@/context/CreditsProvider';
 import { PlusCircle, PlusIcon } from 'lucide-react';
 import {
@@ -12,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 
 const NavBar = () => {
   const session = useSession();
