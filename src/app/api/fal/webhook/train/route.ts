@@ -4,7 +4,7 @@ export async function POST(req: Request) {
   const body = await req.json();
 
   const requestId = body.request_id;
-  const tensorPath = body?.response?.model_path;
+  const tensorPath = body?.payload?.diffusers_lora_file?.url;
 
   if (!requestId || !tensorPath) {
     return new Response('Invalid webhook payload', { status: 400 });
