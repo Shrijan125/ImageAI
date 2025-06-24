@@ -13,14 +13,14 @@ const Camera = () => {
     fetchImages();
   }, []);
   return (
-    <div className="mt-8">
-      <div className="flex justify-between w-full">
+    <div className="mt-8 px-4">
+      <div className="flex justify-between w-full mb-4">
         <h1 className="text-2xl font-bold">Your Gallery</h1>
         <div className="border-white/10 border-[1px] p-2 rounded-2xl text-xs bg-white/20">
-          0 images
+          {`${images.length} ${images.length === 1 ? 'image' : 'images'}`}
         </div>
       </div>
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {images.map((image, index) => (
           <div
             key={index}
