@@ -27,14 +27,14 @@ const Packs = () => {
   }, []);
 
   return (
-    <div className="mt-8 flex flex-col gap-4">
-      <div className="flex flex-col gap-1 ">
+    <div className="mt-8 flex flex-col gap-4 px-4">
+      <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">Select Model</h1>
         <p className="text-secondary-text">
           Choose an AI model to generate your images
         </p>
       </div>
-      <div className="grid grid-cols-3 place-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 place-items-center">
         {models.map((model, index) => (
           <ModelCard
             id={model.id}
@@ -52,7 +52,7 @@ const Packs = () => {
           Choose a pack to generate images with
         </p>
       </div>
-      <div className="grid grid-cols-3 place-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4  place-items-center">
         {packs.map((pack, index) => (
           <PackCard
             id={pack.id}

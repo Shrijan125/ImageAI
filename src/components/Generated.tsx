@@ -74,14 +74,14 @@ const Generated = () => {
     }
   };
   return (
-    <div className="mt-8 flex flex-col gap-4">
+    <div className="mt-8 flex flex-col gap-4 px-4">
       <div className="flex flex-col gap-1 ">
         <h1 className="text-2xl font-bold">Select Model</h1>
         <p className="text-secondary-text">
           Choose an AI model to generate your images
         </p>
       </div>
-      <div className="grid grid-cols-3 place-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 place-items-center">
         {models.map((model, index) => (
           <ModelCard
             id={model.id}
@@ -96,17 +96,18 @@ const Generated = () => {
       <div className="flex flex-col gap-2">
         <Label>Enter your prompt</Label>
         <Textarea
+          className="resize-none h-32"
           onChange={e => {
             setPrompt(e.target.value);
           }}
           placeholder="Generate my image enjoying at the Maldives..."
         ></Textarea>
       </div>
-      <Button onClick={handleClick} variant={'outline'} className="w-[20%]">
+      <Button onClick={handleClick} variant={'outline'} className="sm:w-[20%]">
         Generate Image
       </Button>
-      <div className="">
-        <div className="relative h-[600px] w-[500px] overflow-hidden rounded-md">
+      <div>
+        <div className="relative sm:h-[600px] w-full  h-[400px]  sm:w-[500px] overflow-hidden rounded-md">
           {loading ? (
             <Skeleton className="h-full w-full"></Skeleton>
           ) : (

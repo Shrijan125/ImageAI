@@ -20,7 +20,7 @@ const ModelCard = ({
       onClick={() => {
         setSelected(id);
       }}
-      className={`${selected && 'border-2'} relative ${selected && 'border-white'} rounded-md w-[90%] h-[300px] overflow-hidden`}
+      className={`${selected && 'border-2'} relative ${selected && 'border-white'} rounded-md sm:w-[90%] w-full h-[300px] overflow-hidden`}
     >
       {imgUrl ? (
         <Image

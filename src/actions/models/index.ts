@@ -1,9 +1,22 @@
 'use server';
 
+import { TrainModelFormValues } from '@/components/TrainModel';
 import prisma from '@/db';
 import { TrainModel } from '@/generated/prisma';
 import { authOptions } from '@/lib/auth';
 import { getServerSession } from 'next-auth';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { fal } from '@fal-ai/client';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+const r2Client = new S3Client({
+  region: 'auto',
+  endpoint: process.env.ENDPOINT,
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY!,
+    secretAccessKey: process.env.S3_SECRET_KEY!,
+  },
+});
 
 export const getModels = async (): Promise<TrainModel[]> => {
   const session = await getServerSession(authOptions);
@@ -29,4 +42,61 @@ export const getModels = async (): Promise<TrainModel[]> => {
   });
 
   return models;
+};
+
+export async function getPresignedUrlAction() {
+  const key = `models/${Date.now()}_${Math.random()}.zip`;
+
+  const command = new PutObjectCommand({
+    Bucket: process.env.BUCKET_NAME!,
+    Key: key,
+    ContentType: 'application/zip',
+  });
+
+  const url = await getSignedUrl(r2Client, command, {
+    expiresIn: 60 * 5,
+  });
+
+  return {
+    url,
+    modelkey: key,
+  };
+}
+
+export const trainModel = async (
+  input: TrainModelFormValues,
+) => {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    throw new Error('User not authenticated');
+  }
+  // const { request_id, response_url } = await fal.queue.submit(
+  //   'fal-ai/flux-lora-fast-training',
+  //   {
+  //     input: {
+  //       images_data_url: zipUrl,
+  //       trigger_word: input.name,
+  //     },
+  //     webhookUrl: `${process.env.WEBHOOK_BASE_URL}/api/fal/webhook/train`,
+  //   }
+  // );
+  await prisma.trainModel.create({
+    data: {
+      name: input.name,
+      age: input.age,
+      bald: input.bald,
+      ethinicity: input.ethinicity,
+      eyeColor: input.eyeColor,
+      type: input.type,
+      zipUrl: input.zipUrl,
+      falAIRequestId: 'request_id',
+      falAIResponseUrl: 'response_url',
+      userId: session.user.id,
+      status: 'PENDING',
+    },
+  });
+  return {
+    success: true,
+    message: 'Model training started successfully.',
+  };
 };

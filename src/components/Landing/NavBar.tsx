@@ -54,7 +54,7 @@ const NavBar = () => {
               <PopoverContent className="mr-5">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-center gap-2">
-                    <Avatar className='size-10'>
+                    <Avatar className="size-10">
                       <AvatarFallback>{user?.username[0]}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
@@ -63,18 +63,22 @@ const NavBar = () => {
                     </div>
                   </div>
                   <Separator></Separator>
-                  <div className='flex flex-col gap-4 mt-4'>
-                  <div className="flex items-center p-y-1 justify-between">
-                    <div className="text-sm">Add Credits</div>
-                    <PlusIcon className="size-4"></PlusIcon>
+                  <div className="flex flex-col gap-4 mt-4">
+                    <div className="flex items-center p-y-1 justify-between">
+                      <div className="text-sm">Add Credits</div>
+                      <PlusIcon className="size-4"></PlusIcon>
+                    </div>
+                    <Separator></Separator>
+                    <div
+                      onClick={async () => {
+                        await signOut();
+                      }}
+                      className="flex text-red-500 items-center p-y-1 justify-between"
+                    >
+                      <div className="text-sm">Logout</div>
+                      <LogOut className="size-4"></LogOut>
+                    </div>
                   </div>
-                  <Separator></Separator>
-                  <div onClick={async ()=>{await signOut()}} className="flex text-red-500 items-center p-y-1 justify-between">
-                    <div className="text-sm">Logout</div>
-                    <LogOut className='size-4'></LogOut>
-                  </div>
-                  </div>
-                  
                 </div>
               </PopoverContent>
             </Popover>

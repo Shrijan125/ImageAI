@@ -22,7 +22,7 @@ const PackCard: React.FC<PackCardProps> = ({
       onClick={() => {
         setSelected(id);
       }}
-      className={`relative border-[1px] rounded-md w-[90%] h-[500px] overflow-hidden border-white/30 hover:backdrop-blur-2xl hover:shadow-2xl hover:shadow-primary/30 group transition-all duration-300`}
+      className={`relative border-[1px] rounded-md sm:w-[90%] w-full h-[500px] overflow-hidden border-white/30 hover:backdrop-blur-2xl hover:shadow-2xl hover:shadow-primary/30 group transition-all duration-300`}
     >
       <img
         alt="pack_thumbnail"
