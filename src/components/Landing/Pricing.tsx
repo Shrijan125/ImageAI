@@ -20,14 +20,14 @@ const Pricing = () => {
       'HD Export',
       'Advanced Editing',
     ],
-    [
-      'Unlimited AI portraits',
-      '5 Custom Model Training',
-      '24h Support',
-      'HD Export',
-      'Advanced Editing',
-      'Custom Integration',
-    ],
+    // [
+    //   'Unlimited AI portraits',
+    //   '5 Custom Model Training',
+    //   '24h Support',
+    //   'HD Export',
+    //   'Advanced Editing',
+    //   'Custom Integration',
+    // ],
   ];
   return (
     <div className="text-white mt-40 px-4 max-w-7xl mx-auto">
@@ -44,7 +44,7 @@ const Pricing = () => {
           Choose the perfect plan for your needs. No hidden fees.
         </p>
       </div>
-      <div className="grid sm:grid-cols-3  grid-cols-1 place-items-center mt-20 gap-4 relative">
+      <div className="grid sm:grid-cols-2  grid-cols-1 place-items-center mt-20 gap-4 relative">
         <motion.div
           className="bg-gradient-to-r from-indigo-500/30 to-purple-500/30 absolute blur-2xl w-[300px] h-[300px] sm:-top-50 -top-20 left-1/3 rounded-full"
           initial={{ scale: 1, x: 0, y: 0 }}
@@ -67,11 +67,11 @@ const Pricing = () => {
           features={features[1]!}
           recommended={true}
         ></PricingCard>
-        <PricingCard
+        {/* <PricingCard
           title="Custom"
           price="Custom"
           features={features[2]!}
-        ></PricingCard>
+        ></PricingCard> */}
       </div>
     </div>
   );
