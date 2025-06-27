@@ -57,7 +57,7 @@ const Page = () => {
       zipUrl: '',
     },
   });
-  const {setCredits} = useCredits();
+  const { setCredits } = useCredits();
 
   const handleFileSubmit = async (files: FileWithPreview[]) => {
     try {
@@ -199,7 +199,10 @@ const Page = () => {
           </p>
         </div>
         <Form {...form}>
-          <form className='space-y-6' onSubmit={form.handleSubmit(handleSubmit)}>
+          <form
+            className="space-y-6"
+            onSubmit={form.handleSubmit(handleSubmit)}
+          >
             <FormField
               control={form.control}
               name="name"
@@ -218,14 +221,14 @@ const Page = () => {
                 control={form.control}
                 name="type"
                 render={({ field }) => (
-                  <FormItem className='w-[40%]'>
+                  <FormItem className="w-[40%]">
                     <FormLabel>Type</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className='w-full'>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select a type" />
                         </SelectTrigger>
                       </FormControl>
@@ -259,18 +262,16 @@ const Page = () => {
                 name="bald"
                 render={({ field }) => (
                   <FormItem className="">
-                      <FormLabel>Bald</FormLabel>
+                    <FormLabel>Bald</FormLabel>
                     <FormControl>
-                      <div className='flex items-center justify-center gap-4'>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                      <div className='text-secondary-text'>
-                        {
-                          form.getValues().bald ? 'Yes' : 'No'
-                        }
-                      </div>
+                      <div className="flex items-center justify-center gap-4">
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                        <div className="text-secondary-text">
+                          {form.getValues().bald ? 'Yes' : 'No'}
+                        </div>
                       </div>
                     </FormControl>
                   </FormItem>
@@ -282,14 +283,14 @@ const Page = () => {
                 control={form.control}
                 name="ethinicity"
                 render={({ field }) => (
-                  <FormItem className='w-[50%]'>
+                  <FormItem className="w-[50%]">
                     <FormLabel>Ethnicity</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className='w-full'>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select ethnicity" />
                         </SelectTrigger>
                       </FormControl>
@@ -309,14 +310,14 @@ const Page = () => {
                 control={form.control}
                 name="eyeColor"
                 render={({ field }) => (
-                  <FormItem className='w-[50%]'>
+                  <FormItem className="w-[50%]">
                     <FormLabel>Eye Color</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger className='w-full'>
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select eye color" />
                         </SelectTrigger>
                       </FormControl>
@@ -340,7 +341,6 @@ const Page = () => {
                 <FormItem>
                   <FormLabel>Upload Images</FormLabel>
                   <FormControl>
-
                     <div className="w-full max-w-2xl mx-auto mt-4">
                       <div
                         className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 ${
@@ -409,18 +409,18 @@ const Page = () => {
                 </FormItem>
               )}
             />
-            <Button disabled={loading} type='submit'>
-              {
-                loading ? <Loader></Loader> : 'Train Model (20 credits)'
-              }
+            <Button disabled={loading} type="submit">
+              {loading ? <Loader></Loader> : 'Train Model (20 credits)'}
             </Button>
           </form>
         </Form>
       </div>
       <div className="sm:pl-8 px-4 sm:px-0 sm:mt-0 mt-20 flex flex-col justify-center ">
-        <div className='text-lg font-bold'>
+        <div className="text-lg font-bold">
           Image Preview
-          <div className='text-sm text-secondary-text'>Preview of your uploaded images</div>
+          <div className="text-sm text-secondary-text">
+            Preview of your uploaded images
+          </div>
         </div>
         {files.length > 0 && (
           <div className="mt-6">
@@ -467,10 +467,10 @@ const Page = () => {
         )}
         {files.length === 0 && !dragActive && (
           <div className="mt-16 text-center py-8">
-            <div className='w-full flex items-center justify-center'> 
-            <div className='w-42 flex items-center justify-center h-42 rounded-full bg-gray-700'>
-            <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            </div>
+            <div className="w-full flex items-center justify-center">
+              <div className="w-42 flex items-center justify-center h-42 rounded-full bg-gray-700">
+                <ImageIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              </div>
             </div>
             <p className="text-secondary-text mt-8">No images uploaded yet</p>
           </div>

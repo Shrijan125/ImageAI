@@ -17,8 +17,8 @@ const populatePrompt = (template: string, model: TrainModel): string => {
     .replace(/<age>/g, String(model.age))
     .replace(/<gender>/g, model.type)
     .replace(/<ethnicity>/g, model.ethinicity)
-    .replace(/<eye_color>/g, model.eyeColor).
-    replace(/<bald>/g, '');;
+    .replace(/<eye_color>/g, model.eyeColor)
+    .replace(/<bald>/g, '');
 };
 
 const Packs = () => {
@@ -62,7 +62,7 @@ const Packs = () => {
 
     try {
       const results = await Promise.all(
-        prompts.map(p => 
+        prompts.map(p =>
           fal.subscribe('fal-ai/flux-lora', {
             input: {
               prompt: populatePrompt(p.prompt, modelDetails),
@@ -92,7 +92,7 @@ const Packs = () => {
           5
         );
       }
-      setCredits(prev => prev - (cost));
+      setCredits(prev => prev - cost);
       toast.success('Images generated successfully!');
     } catch (error) {
       toast.error('Image generation failed.');
@@ -101,12 +101,11 @@ const Packs = () => {
     setLoadingPackId(''); // Reset loading state
   };
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const modelsResponse = await getModels();
-        const packsResponse : GetPackResponse[] = await getPacks();
+        const packsResponse: GetPackResponse[] = await getPacks();
         setModels(modelsResponse);
         setPacks(packsResponse);
       } catch (error) {

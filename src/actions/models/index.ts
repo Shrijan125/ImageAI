@@ -102,14 +102,14 @@ export const trainModel = async ({
     },
   });
   await prisma.user.update({
-    where:{
+    where: {
       id: session.user.id,
     },
-    data:{
+    data: {
       credits: {
         decrement: 20,
       },
-    }
+    },
   });
   return {
     success: true,

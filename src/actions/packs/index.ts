@@ -15,7 +15,8 @@ export interface GetPackResponse {
     id: string;
     prompt: string;
   }[];
-}[]
+}
+[];
 
 export const getPacks = async (): Promise<GetPackResponse[]> => {
   const session = await getServerSession(authOptions);
@@ -33,13 +34,13 @@ export const getPacks = async (): Promise<GetPackResponse[]> => {
         },
       },
     },
-    include:{
+    include: {
       PackPrompts: {
         select: {
           prompt: true,
           id: true,
         },
-      }
+      },
     },
     orderBy: {
       createdAt: 'desc',

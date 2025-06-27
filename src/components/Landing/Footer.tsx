@@ -18,9 +18,7 @@ const Footer = () => {
 
         {/* Copyright Section */}
         <div className="text-center md:text-right">
-          <p className="text-sm">
-            &copy; {currentYear} Shrijan Shreshth.
-          </p>
+          <p className="text-sm">&copy; {currentYear} Shrijan Shreshth.</p>
           <p className="text-sm">All rights reserved.</p>
         </div>
       </div>

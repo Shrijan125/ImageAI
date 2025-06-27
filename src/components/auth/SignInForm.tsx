@@ -14,7 +14,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '../ui/input';
 import Link from 'next/link';
-import { signIn } from 'next-auth/react';
+import { getSession, signIn } from 'next-auth/react';
 import { toast } from 'sonner';
 import Loader from '../Loader';
 import { useRouter } from 'next/navigation';
@@ -46,7 +46,8 @@ export const SignInForm = () => {
         return;
       }
 
-      if (result?.ok) {
+      const session = await getSession();
+      if (session) {
         toast.success('Signed in successfully!');
         router.replace('/home');
       }

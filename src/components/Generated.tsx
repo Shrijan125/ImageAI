@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 
 const Generated = () => {
   const [models, setModels] = useState<TrainModel[]>([]);
-  const {setCredits, credits} = useCredits();
+  const { setCredits, credits } = useCredits();
   useEffect(() => {
     const fetchModels = async () => {
       const result: TrainModel[] = await getModels();
@@ -40,7 +40,7 @@ const Generated = () => {
       setLoading(false);
       return;
     }
-    if(credits < 5) {
+    if (credits < 5) {
       toast.error('You do not have enough credits to generate an image.');
       setLoading(false);
       router.push('/home/pricing');

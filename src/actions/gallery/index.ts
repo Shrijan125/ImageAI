@@ -38,7 +38,7 @@ export const saveImage = async (
   modelId: string,
   prompt: string,
   requestId: string,
-  cost : number
+  cost: number
 ): Promise<void> => {
   const session = await getServerSession(authOptions);
   if (!session || !session.user) {
@@ -66,14 +66,14 @@ export const saveImage = async (
   }
 
   await prisma.user.update({
-    where:{
+    where: {
       id: user.id,
     },
     data: {
       credits: {
         decrement: cost,
       },
-    }
+    },
   });
 
   await prisma.outputImages.create({

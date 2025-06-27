@@ -7,7 +7,7 @@ interface PackCardProps {
   name: string;
   description: string;
   id: string;
-  handleGenerate: (packid: string) => Promise<void>
+  handleGenerate: (packid: string) => Promise<void>;
   loading: boolean;
 }
 
@@ -37,12 +37,14 @@ const PackCard: React.FC<PackCardProps> = ({
               : description}
           </p>
         </div>
-        <Button disabled={loading} onClick={async()=>{
-         await handleGenerate(id);
-        }} className="m-4 hover:cursor-pointer">
-          {
-            loading ? <Loader></Loader> : 'Generate Images'
-          }
+        <Button
+          disabled={loading}
+          onClick={async () => {
+            await handleGenerate(id);
+          }}
+          className="m-4 hover:cursor-pointer"
+        >
+          {loading ? <Loader></Loader> : 'Generate Images'}
         </Button>
       </div>
     </div>

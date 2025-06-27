@@ -11,6 +11,6 @@ export default function AuthProvider({
     fal.config({
       proxyUrl: '/api/fal/proxy',
     });
-  },[]);
+  }, []);
   return <SessionProvider>{children}</SessionProvider>;
 }
